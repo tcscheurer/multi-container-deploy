@@ -23,3 +23,16 @@ after_success:
   - docker push tcscheurer/multi-nginx
   - docker push tcscheurer/multi-server
   - docker push tcscheurer/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  regions: us-east-2
+  app: multi-container
+  env: MultiContainer-env
+  bucket_name: elasticbeanstalk-us-east-2-591556832679
+  bucket_path: multi-container
+  on:
+      branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
