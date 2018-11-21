@@ -1,0 +1,25 @@
+sudo: required
+services: 
+  - docker
+
+before_install: 
+  - docker build -t tcscheurer/react-test -f ./ui-app/Dockerfile.dev ./ui-app
+
+script:
+  - docker run tcscheurer/react-test npm test -- --coverage
+
+after_success:
+  # Build our services images
+  - docker build -t tcscheurer/multi-client ./ui-app
+  - docker build -t tcscheurer/multi-nginx ./nginx
+  - docker build -t tcscheurer/multi-server ./server
+  - docker build -t tcscheurer/multi-worker ./worker
+
+  # Log in to Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # push those images to docker hub
+  - docker push tcscheurer/multi-client
+  - docker push tcscheurer/multi-nginx
+  - docker push tcscheurer/multi-server
+  - docker push tcscheurer/multi-worker
